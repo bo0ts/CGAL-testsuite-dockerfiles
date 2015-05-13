@@ -20,6 +20,7 @@ from __future__ import division
 import argparse
 from getpass import getuser
 from os import path
+import os
 import re
 import shutil
 from socket import gethostname
@@ -101,12 +102,12 @@ def extract(path):
     print 'Extracting ' + path
     assert tarfile.is_tarfile(path), 'Path provided to extract is not a tarfile'
     tar = tarfile.open(path)
-    commonprefix = path.commonprefix(tar.getnames())
+    commonprefix = os.path.commonprefix(tar.getnames())
     assert commonprefix != '.', 'Tarfile has no single common prefix'
-    assert not path.isabs(commonprefix), 'Common prefix is an absolute path'
-    tar.extractall(path.dirname(path)) # extract to the download path
+    assert not os.path.isabs(commonprefix), 'Common prefix is an absolute path'
+    tar.extractall(os.path.dirname(path)) # extract to the download path
     tar.close()
-    return path.join(path.dirname(path), commonprefix)
+    return os.path.join(os.path.dirname(path), commonprefix)
 
 def default_images():
     """Returns a list of all image tags starting with cgal-testsuite/."""
@@ -322,7 +323,7 @@ def main():
         assert args.tester, 'When uploading a --tester has to be given'
         assert args.tester_name, 'When uploading a --tester-name has to be given'
         assert args.tester_address, 'When uploading a --tester-name has to be given'
-        assert 'gztar' in shutil.get_archive_formats(), 'When uploading results, gztar needs to be available'
+        assert 'gztar' in [item[0] for item in shutil.get_archive_formats()], 'When uploading results, gztar needs to be available'
 
     print 'Using images ' + ', '.join(args.images)
 
